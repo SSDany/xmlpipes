@@ -1,0 +1,33 @@
+GIT
+  remote: git://github.com/freelancing-god/riddle.git
+  revision: af2eda1c71c6d1fc924129324fa422a76ffe82f9
+  specs:
+    riddle (1.1.0)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    diff-lcs (1.1.2)
+    fakefs (0.2.1)
+    nokogiri (1.4.3.1)
+    rcov (0.9.9)
+    rspec (2.0.1)
+      rspec-core (~> 2.0.1)
+      rspec-expectations (~> 2.0.1)
+      rspec-mocks (~> 2.0.1)
+    rspec-core (2.0.1)
+    rspec-expectations (2.0.1)
+      diff-lcs (>= 1.1.2)
+    rspec-mocks (2.0.1)
+      rspec-core (~> 2.0.1)
+      rspec-expectations (~> 2.0.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  fakefs (>= 0.2.1)
+  nokogiri (>= 1.4.3)
+  rcov (>= 0.9.9)
+  riddle (>= 1.1.0)!
+  rspec (>= 1.3.0)
