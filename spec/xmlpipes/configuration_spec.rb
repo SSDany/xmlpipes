@@ -156,12 +156,27 @@ describe XMLPipes::Configuration do
 
   describe '#client' do
 
+    before :each do
+      @instance.send(:address=, '10.0.0.2')
+      @instance.send(:port=, 9313)
+      @instance.configuration.searchd.max_matches = 100
+    end
+
     it 'returns an instance of the Riddle::Client' do
       @instance.client.should be_an_instance_of Riddle::Client
     end
 
-    it 'uses proper address'
-    it 'uses proper port'
+    it 'uses the configuration address' do
+      @instance.client.server.should == '10.0.0.2'
+    end
+
+    it 'uses the configuration port' do
+      @instance.client.port.should == 9313
+    end
+
+    it 'uses the configuration max matches' do
+      @instance.client.max_matches.should == 100
+    end
 
   end
 
@@ -198,12 +213,12 @@ describe XMLPipes::Configuration do
 
   describe '#build' do
     it 'generates configuration and writes it into the sphinx.conf file' do
-      FakeFS.activate!
-      XMLPipes::Configuration.configure { |c| c.environment = :test }
-      @instance.should_receive(:render).and_return('configuration')
-      @instance.build
-      File.read(File.join(@instance.root, 'config/test.sphinx.conf')).should == 'configuration'
-      FakeFS.deactivate!
+      FakeFS do
+        XMLPipes::Configuration.configure { |c| c.environment = :test }
+        @instance.should_receive(:render).and_return('configuration')
+        @instance.build
+        File.read(File.join(@instance.root, 'config/test.sphinx.conf')).should == 'configuration'
+      end
     end
   end
 
