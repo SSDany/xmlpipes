@@ -70,11 +70,20 @@ module XMLPipes #:nodoc:
       cli
     end
 
-    def results
-      raise NotImplementedError
+    def populated?
+      !!@populated
     end
 
-    alias :to_a :results
+    def results
+      populate
+      @results
+    end
+
+    def document_ids
+      results[:matches].map { |thing| thing[:doc] }
+    end
+
+    alias :to_a :document_ids
 
     def clone
       copy = self.class.new(@args, @options).apply(self)
@@ -97,6 +106,14 @@ module XMLPipes #:nodoc:
 
     attr_reader :_match_mode
     attr_reader :_sort_mode
+
+    def populate
+      return if populated?
+      @populated = true
+      @results = client.query(query, indexes)
+    rescue Errno::ECONNREFUSED => exception
+      raise
+    end
 
     def apply(object)
       return unless self.class === object
