@@ -377,7 +377,7 @@ describe XMLPipes::Search do
 
     it 'uses requested classes to generate the list of indexes' do
       search = XMLPipes::Search.new('Misaki', :classes => [Book, Article])
-      search.send(:indexes).should == 'titles_core,books_core,books_delta,articles_core'
+      search.send(:indexes).should == 'titles_core,books_core,books_delta,articles_core,articles_delta'
     end
 
     it 'uses "*" otherwise' do

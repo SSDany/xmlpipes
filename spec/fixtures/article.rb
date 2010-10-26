@@ -1,5 +1,10 @@
+require 'xmlpipes/strategies/simple'
+
 class Article
   include XMLPipes
+
+  # one index, one source
+  extend XMLPipes::Strategies::Simple
 
   define_pipes(:articles) do |index|
 
@@ -14,6 +19,7 @@ class Article
       schema.timestamp  :created_at
     end
 
+    index.enable_deltas
   end
 
 end
