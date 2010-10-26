@@ -7,7 +7,7 @@ describe XMLPipes::Index do
   end
 
   before(:each) do
-    @index = XMLPipes::Index.new(:spec, :klass)
+    @index = XMLPipes::Index.new(:spec, Article)
   end
 
   it 'has no deltas by default' do
@@ -91,14 +91,14 @@ describe XMLPipes::Index do
   end
 
   describe '#attributes' do
-    it 'returns a full list of attributes' do
+    it 'returns a full list of attributes (include xmlpipes_class_crc)' do
       @index.schema do |schema|
         schema.timestamp :created_at
         schema.timestamp :updated_at
         schema.bool :deleted
       end
-      @index.attributes.size.should == 3
-      @index.attributes.map { |a| a.name }.should == [:created_at, :updated_at, :deleted]
+      @index.attributes.size.should == 4
+      @index.attributes.map { |a| a.name }.should == [:xmlpipes_class_crc, :created_at, :updated_at, :deleted]
     end
   end
 
@@ -184,17 +184,11 @@ describe XMLPipes::Index do
       @core.parent.should be_nil
     end
 
-    it 'ignores user-defined docinfo, if any' do
+    it 'uses user-defined docinfo, if any' do
       @index.set :docinfo, :none
       @index.schema { |shema| shema.bool :deleted }
       @index.docinfo.should == :none
       @index.send(:core).docinfo.should == :none
-    end
-
-    it 'ignores docinfo if there are no attributes in schema definition' do
-      @index.schema { |schema| }
-      @index.docinfo.should be_nil
-      @index.send(:core).docinfo.should be_nil
     end
 
     it 'defaults docinfo to :extern otherwise' do

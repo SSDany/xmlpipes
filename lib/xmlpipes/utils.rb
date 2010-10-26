@@ -55,7 +55,7 @@ module XMLPipes #:nodoc:
         when Time, Date, DateTime
           self.timestamp(v)
         when String
-          Zlib.crc32(v)
+          self.crc32(v)
         else
           v
         end
@@ -70,6 +70,10 @@ module XMLPipes #:nodoc:
 
     def str2ordinal(value)
       value.to_s
+    end
+
+    def crc32(value)
+      value.respond_to?(:to_crc32) ? value.to_crc32 : Zlib.crc32(value.to_s)
     end
 
   end

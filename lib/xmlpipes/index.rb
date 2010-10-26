@@ -11,6 +11,8 @@ module XMLPipes #:nodoc:
       @options  = {}
       @klass    = klass
       @schema   = Source::Schema.new(self)
+      # TODO: should @xmlpipes_class_crc be overridable?
+      @schema.integer :xmlpipes_class_crc, :default => Utils.crc32(@klass)
     end
 
     def set(key, value)

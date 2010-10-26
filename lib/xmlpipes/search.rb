@@ -61,6 +61,10 @@ module XMLPipes #:nodoc:
       @classes.size == 1
     end
 
+    def class_crcs
+      @classes.collect { |klass| Utils.crc32(klass) }
+    end
+
     def client
       cli = config.client
       cli.match_mode = match_mode

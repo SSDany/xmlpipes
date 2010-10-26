@@ -308,23 +308,29 @@ describe XMLPipes::Indexer do
     end
 
     it 'uses proper attributes' do
-      @schema.xpath('count(sphinx:attr)').should == 3
+      @schema.xpath('count(sphinx:attr)').should == 4
 
-      @schema.xpath('count(sphinx:attr[1]/@*)').should == 3
-      @schema.xpath('sphinx:attr[1]/@name').to_s.should == 'tags'
-      @schema.xpath('sphinx:attr[1]/@type').to_s.should == 'multi'
-      @schema.xpath('sphinx:attr[1]/@default').to_s.should == 'manga'
+      @schema.xpath('count(sphinx:attr[1]/@*)').should == 4
+      @schema.xpath('sphinx:attr[1]/@name').to_s.should == 'xmlpipes_class_crc'
+      @schema.xpath('sphinx:attr[1]/@type').to_s.should == 'int'
+      @schema.xpath('sphinx:attr[1]/@default').to_s.should == '1809255439'
+      @schema.xpath('sphinx:attr[1]/@bits').to_s.should == '32'
 
-      @schema.xpath('count(sphinx:attr[2]/@*)').should == 4
-      @schema.xpath('sphinx:attr[2]/@name').to_s.should == 'volumes'
-      @schema.xpath('sphinx:attr[2]/@type').to_s.should == 'int'
-      @schema.xpath('sphinx:attr[2]/@bits').to_s.should == '8'
-      @schema.xpath('sphinx:attr[2]/@default').to_s.should == '1'
+      @schema.xpath('count(sphinx:attr[2]/@*)').should == 3
+      @schema.xpath('sphinx:attr[2]/@name').to_s.should == 'tags'
+      @schema.xpath('sphinx:attr[2]/@type').to_s.should == 'multi'
+      @schema.xpath('sphinx:attr[2]/@default').to_s.should == 'manga'
 
-      @schema.xpath('count(sphinx:attr[3]/@*)').should == 3
-      @schema.xpath('sphinx:attr[3]/@name').to_s.should == 'deleted'
-      @schema.xpath('sphinx:attr[3]/@type').to_s.should == 'bool'
-      @schema.xpath('sphinx:attr[3]/@default').to_s.should == '0'
+      @schema.xpath('count(sphinx:attr[3]/@*)').should == 4
+      @schema.xpath('sphinx:attr[3]/@name').to_s.should == 'volumes'
+      @schema.xpath('sphinx:attr[3]/@type').to_s.should == 'int'
+      @schema.xpath('sphinx:attr[3]/@bits').to_s.should == '8'
+      @schema.xpath('sphinx:attr[3]/@default').to_s.should == '1'
+
+      @schema.xpath('count(sphinx:attr[4]/@*)').should == 3
+      @schema.xpath('sphinx:attr[4]/@name').to_s.should == 'deleted'
+      @schema.xpath('sphinx:attr[4]/@type').to_s.should == 'bool'
+      @schema.xpath('sphinx:attr[4]/@default').to_s.should == '0'
     end
 
   end
