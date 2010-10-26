@@ -5,6 +5,10 @@ class Book
   attr_accessor :title, :description, :authors, :publisher
   attr_accessor :tags, :volumes
 
+  def self.from_document_id(document_id)
+    YAML.load_file(File.join(File.dirname(__FILE__), "yml/#{document_id}.yml"))
+  end
+
   define_pipes(:titles) do |index|
     index.schema { |schema| schema.field :title }
   end

@@ -260,22 +260,18 @@ describe XMLPipes::Search do
       Riddle::Client::Filter.should_not_receive(:new)
       scoped = @search.send(:apply_filters, false, {})
       scoped.should be_eql @search
-      scoped.client.filters.size.should == 0
     end
 
     it 'ignores unknown attributes' do
       Riddle::Client::Filter.should_not_receive(:new)
       scoped = @search.send(:apply_filters, false, :bogus => true)
       scoped.should be_eql @search
-      scoped.client.filters.size.should == 0
     end
 
     it 'does not create a new filter when same filter is already applied' do
       @search.send(:apply_filters, false, :deleted => false)
-      @search.client.filters.size.should == 1
       Riddle::Client::Filter.should_not_receive(:new)
       @search.send(:apply_filters, false, :deleted => false)
-      @search.client.filters.size.should == 1
     end
 
   end
@@ -316,6 +312,37 @@ describe XMLPipes::Search do
     it 'uses "*" otherwise' do
       search = XMLPipes::Search.new('Misaki')
       search.send(:indexes).should == '*'
+    end
+
+  end
+
+  describe '#populated?' do
+
+    before(:each) do
+      @search = XMLPipes::Search.new('Misaki')
+    end
+
+    it 'returns false if the client request has not been made' do
+      @search.should_not be_populated
+    end
+
+    it 'returns true otherwise' do
+      @search.should_receive(:client).and_return(mock(:client, :query => {:matches => []}))
+      @search.documents
+      @search.should be_populated
+    end
+
+  end
+
+  describe '#documents' do
+
+    it 'works (just a temporary integration test)' do
+      search = XMLPipes::Search.new('Misaki', :classes => Book)
+      matches = []
+      matches << {:attributes => {'xmlpipes_class_crc' => '1809255439'},:doc => '1558914253'}
+      search.should_receive(:results).and_return(:matches => matches)
+      documents = search.documents
+      documents.first.title.should == 'NHK ni Youkoso!'
     end
 
   end

@@ -179,6 +179,11 @@ module XMLPipes #:nodoc:
       @indexed << klass unless @indexed.include?(klass)
     end
 
+    def class_from_crc(crc)
+      @indexed_by_crc ||= {}
+      @indexed_by_crc[crc] ||= @indexed.detect { |klass| Utils.crc32(klass) == crc }
+    end
+
     def render
       @configuration.indexes.clear
       @indexed.each { |klass| @configuration.indexes.concat(klass.to_riddle) }

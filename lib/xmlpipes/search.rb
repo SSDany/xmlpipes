@@ -68,7 +68,7 @@ module XMLPipes #:nodoc:
     def client
       cli = config.client
       cli.match_mode = match_mode
-      cli.filters    = filters
+      cli.filters    = internal_filters + filters
       cli.sort_mode  = sort_mode
       cli.sort_by    = sort_by if sort_by
       cli
@@ -76,6 +76,11 @@ module XMLPipes #:nodoc:
 
     def populated?
       !!@populated
+    end
+
+    def repopulate
+      @populated = false
+      populate
     end
 
     def results
@@ -87,7 +92,14 @@ module XMLPipes #:nodoc:
       results[:matches].map { |thing| thing[:doc] }
     end
 
-    alias :to_a :document_ids
+    def documents
+      results[:matches].map { |thing| document(thing) }
+    end
+
+    def each_document(&block)
+      raise LocalJumpError unless block_given?
+      results[:matches].map { |thing| yield(document(thing)) }
+    end
 
     def clone
       copy = self.class.new(@args, @options).apply(self)
@@ -157,6 +169,17 @@ module XMLPipes #:nodoc:
       self
     end
 
+    def internal_filters
+      @internal_filters ||= begin
+        internal = []
+        class_crcs = @classes.map { |klass| Utils.crc32(klass) }
+        unless class_crcs.empty?
+          internal << Riddle::Client::Filter.new('xmlpipes_class_crc', class_crcs)
+        end
+        internal
+      end
+    end
+
     def apply_order(value)
       @_sort_mode = case @sort_by = value
       when String
@@ -170,6 +193,11 @@ module XMLPipes #:nodoc:
     end
 
     private
+
+    def document(thing)
+      klass = config.class_from_crc(thing[:attributes]['xmlpipes_class_crc'].to_i)
+      klass.from_document_id(thing[:doc].to_i)
+    end
 
     def options=(value = {})
       @options = {}
