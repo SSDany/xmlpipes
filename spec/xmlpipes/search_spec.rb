@@ -76,7 +76,7 @@ describe XMLPipes::Search do
 
   end
 
-  describe 'sort mode' do
+  describe '#sort_mode' do
 
     it 'uses :relevance by default' do
       search = XMLPipes::Search.new('Misaki')
@@ -298,6 +298,77 @@ describe XMLPipes::Search do
       query = search.query
       query.should =~ %r{@title NHK}
       query.should =~ %r{@description hikikomori}
+    end
+
+  end
+
+  it 'allows to specify the order explicitly' do
+    search = XMLPipes::Search.new('Misaki', :order => 'volumes ASC')
+    search.client.sort_by.should == 'volumes ASC'
+  end
+
+  it 'and presumes order symbols are attributes' do
+    search = XMLPipes::Search.new('Misaki', :order => :volumes)
+    search.client.sort_by.should == 'volumes'
+  end
+
+  describe '#order' do
+
+    it 'creates a copy of self' do
+      search = XMLPipes::Search.new('Misaki')
+      scoped = search.order('volumes ASC')
+      scoped.should_not be_equal search
+      scoped.client.sort_by.should == 'volumes ASC'
+    end
+
+    it 'concatenates ordering' do
+      search = XMLPipes::Search.new('Misaki', :order => 'rating DESC')
+      scoped = search.order('volumes ASC')
+      scoped.client.sort_by.should == 'rating DESC, volumes ASC'
+    end
+
+  end
+
+  it 'allows to specify the limit explicitly' do
+    search = XMLPipes::Search.new('Misaki', :limit => 10)
+    search.client.limit.should == 10
+  end
+
+  describe '#limit' do
+
+    it 'creates a copy of self' do
+      search = XMLPipes::Search.new('Misaki')
+      scoped = search.limit(5)
+      scoped.should_not be_equal search
+      scoped.client.limit.should == 5
+    end
+
+    it 'overrides previuosly defined limit' do
+      search = XMLPipes::Search.new('Misaki', :limit => 10)
+      scoped = search.limit(5)
+      scoped.client.limit.should == 5
+    end
+
+  end
+
+  it 'allows to specify the offset explicitly' do
+    search = XMLPipes::Search.new('Misaki', :offset => 10)
+    search.client.offset.should == 10
+  end
+
+  describe '#offset' do
+
+    it 'creates a copy of self' do
+      search = XMLPipes::Search.new('Misaki')
+      scoped = search.offset(5)
+      scoped.should_not be_equal search
+      scoped.client.offset.should == 5
+    end
+
+    it 'overrides previuosly defined offset' do
+      search = XMLPipes::Search.new('Misaki', :offset => 10)
+      scoped = search.offset(5)
+      scoped.client.offset.should == 5
     end
 
   end

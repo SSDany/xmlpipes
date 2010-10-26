@@ -6,11 +6,11 @@ module XMLPipes #:nodoc:
     def initialize(*args)
       @classes      = []
       @filters      = []
+      @sort_by      = []
       @conditions   = ''
       @_match_mode  = :all
       @_sort_mode   = :relevance
-      @sort_by      = nil
-      self.options  = Hash === args.last ? args.pop : {}
+      apply_options Hash === args.last ? args.pop : {}
       @args         = args.flatten
     end
 
@@ -57,20 +57,33 @@ module XMLPipes #:nodoc:
       end
     end
 
-    def one_class?
-      @classes.size == 1
+    def offset(value = nil)
+      return @options[:offset] && @options[:offset].to_i if value.nil?
+      copy = clone
+      copy.options[:offset] = value
+      copy
     end
 
-    def class_crcs
-      @classes.collect { |klass| Utils.crc32(klass) }
+    def limit(value = nil)
+      return @options[:limit] && @options[:limit].to_i if value.nil?
+      copy = clone
+      copy.options[:limit] = value
+      copy
+    end
+
+    def max_matches
+      @options[:max_matches] # FIXME try to get actual value from index_options
     end
 
     def client
       cli = config.client
-      cli.match_mode = match_mode
-      cli.filters    = internal_filters + filters
-      cli.sort_mode  = sort_mode
-      cli.sort_by    = sort_by if sort_by
+      cli.max_matches = max_matches if max_matches
+      cli.offset      = offset
+      cli.limit       = limit
+      cli.match_mode  = match_mode
+      cli.filters     = internal_filters + filters
+      cli.sort_mode   = sort_mode
+      cli.sort_by     = sort_by.join(', ') unless sort_by.empty?
       cli
     end
 
@@ -123,20 +136,12 @@ module XMLPipes #:nodoc:
     attr_reader :_match_mode
     attr_reader :_sort_mode
 
-    def populate
-      return if populated?
-      @populated = true
-      @results = client.query(query, indexes)
-    rescue Errno::ECONNREFUSED => exception
-      raise
-    end
-
     def apply(object)
       return unless self.class === object
       @filters.concat object.filters
       @classes.concat object.classes
+      @sort_by.concat object.sort_by
       @conditions  << object.conditions
-      @sort_by      = object.sort_by #.dup
       @_match_mode  = object._match_mode
       @_sort_mode   = object._sort_mode
       self
@@ -169,19 +174,8 @@ module XMLPipes #:nodoc:
       self
     end
 
-    def internal_filters
-      @internal_filters ||= begin
-        internal = []
-        class_crcs = @classes.map { |klass| Utils.crc32(klass) }
-        unless class_crcs.empty?
-          internal << Riddle::Client::Filter.new('xmlpipes_class_crc', class_crcs)
-        end
-        internal
-      end
-    end
-
     def apply_order(value)
-      @_sort_mode = case @sort_by = value
+      @_sort_mode = case value
       when String
         :extended
       when Symbol
@@ -189,18 +183,12 @@ module XMLPipes #:nodoc:
       else
         :relevance
       end
+      @sort_by << value.to_s
       self
     end
 
-    private
-
-    def document(thing)
-      klass = config.class_from_crc(thing[:attributes]['xmlpipes_class_crc'].to_i)
-      klass.from_document_id(thing[:doc].to_i)
-    end
-
-    def options=(value = {})
-      @options = {}
+    def apply_options(value = {})
+      @options ||= {}
       value.each do |k,v|
         case k.to_sym
         when :with
@@ -217,15 +205,28 @@ module XMLPipes #:nodoc:
           @options[k] = v
         end
       end
-      nil
+      self
+    end
+
+    private
+
+    def populate
+      return if populated?
+      @populated = true
+      @results = client.query(query, indexes)
+    rescue Errno::ECONNREFUSED => exception
+      raise
+    end
+
+    def document(thing)
+      klass = config.class_from_crc(thing[:attributes]['xmlpipes_class_crc'].to_i)
+      klass.from_document_id(thing[:doc].to_i)
     end
 
     def attributes
-      @attributes ||= begin
-        one_class? ?
-        @classes.first.sphinx_pipes.collect { |i| i.attributes.map { |a| a.name } }.flatten :
-        []
-      end
+      @attributes ||= @classes.collect { |klass| 
+        klass.sphinx_pipes.collect { |i| i.attributes.map { |a| a.name }}
+      }.flatten
     end
 
     def indexes
@@ -237,6 +238,17 @@ module XMLPipes #:nodoc:
 
     def has_filter?(a,v,e)
       @filters.any? { |f| f.attribute == a && f.values == v && f.exclude == e }
+    end
+
+    def internal_filters
+      @internal_filters ||= begin
+        internal = []
+        class_crcs = @classes.map { |klass| Utils.crc32(klass) }
+        unless class_crcs.empty?
+          internal << Riddle::Client::Filter.new('xmlpipes_class_crc', class_crcs)
+        end
+        internal
+      end
     end
 
     # source:
