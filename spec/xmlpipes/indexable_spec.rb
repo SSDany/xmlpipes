@@ -81,4 +81,15 @@ describe XMLPipes::Indexable do
 
   end
 
+  it 'provides the #document_id method (attr_reader)' do
+    @class.new.should respond_to(:document_id)
+  end
+
+  it 'does not override the #document_id method' do
+    klass = Class.new { def document_id; 42; end }
+    klass.new.document_id.should == 42
+    klass.extend XMLPipes::Indexable
+    klass.new.document_id.should == 42
+  end
+
 end

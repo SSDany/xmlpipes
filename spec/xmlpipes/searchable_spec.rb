@@ -6,6 +6,23 @@ describe XMLPipes::Searchable do
     @class = Class.new { extend XMLPipes::Searchable }
   end
 
+  it 'provides the #from_document_id method' do
+    @class.should respond_to(:from_document_id)
+  end
+
+  it 'which raises a NotImplementedError, unfortunately' do
+    lambda { @class.from_document_id(42) }.
+    should raise_error NotImplementedError, %r{XMLPipes::Searchable}
+  end
+
+  it 'and it does not override an existing #from_document_id method' do
+    klass = Class.new { def self.from_document_id(doc); doc; end }
+    klass.from_document_id(42).should == 42
+    klass.extend XMLPipes::Searchable
+    lambda { klass.from_document_id(42) }.should_not raise_error
+    klass.from_document_id(42).should == 42
+  end
+
   it 'provides the #search method' do
     @class.should respond_to(:search)
   end

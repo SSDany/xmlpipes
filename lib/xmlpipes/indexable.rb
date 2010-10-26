@@ -1,6 +1,10 @@
 module XMLPipes #:nodoc:
   module Indexable
 
+    def self.extended(klass)
+      klass.send(:attr_reader, :document_id) unless klass.public_method_defined?(:document_id)
+    end
+
     def define_pipes(name,&block)
       index = Index.new(name,self)
       yield(index) if block_given?

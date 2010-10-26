@@ -1,10 +1,15 @@
-module XMLPipes
+module XMLPipes #:nodoc:
   module Searchable
 
     def self.extended(klass)
-      # TODO:
-      # check if klass respond to #from_document_id
-      # and define this method if not.
+      klass.class_eval do
+        def self.from_document_id(document_id, options = {})
+          raise NotImplementedError,
+                'XMLPipes::Searchable requires you to implement this method yourself. ' \
+                'Sorry.'
+        end
+      end unless klass.methods.include?('from_document_id') ||
+                 klass.methods.include?(:from_document_id)
     end
 
     def search(*args)
