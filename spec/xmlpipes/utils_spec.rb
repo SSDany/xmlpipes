@@ -116,7 +116,15 @@ describe XMLPipes::Utils do
 
   end
 
-  describe '.int'
+  describe '.int' do
+
+    it 'raises a RangeError when called with check_bits = true and value is greater than allowed' do
+      lambda { XMLPipes::Utils.int(42, 2, true) }.should raise_error RangeError
+      lambda { XMLPipes::Utils.int(2**32, 32, true) }.should raise_error RangeError
+    end
+
+  end
+
   describe '.str2ordinal'
 
 end

@@ -62,11 +62,10 @@ module XMLPipes #:nodoc:
       }.join(',')
     end
 
-    def int(value, bits = 32)
-      value.to_i
-      # value = value.to_i
-      # raise RangeError if value.abs.to_s(2).size > bits
-      # value
+    def int(value, bits = 32, check_bits = false)
+      v = value.to_i
+      raise RangeError if check_bits && v.abs.to_s(2).size > bits
+      v
     end
 
     def str2ordinal(value)
