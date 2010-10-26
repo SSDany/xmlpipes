@@ -39,7 +39,7 @@ module XMLPipes #:nodoc:
       #++
 
       def indexes(fieldname, options = {})
-        @fields << Source::Field.new(fieldname, options)
+        add_field Source::Field.new(fieldname, options)
       end
 
       alias :field :indexes
@@ -61,27 +61,27 @@ module XMLPipes #:nodoc:
       #++
 
       def boolean(attrname, options = {})
-        @attrs << Source::Attribute.new(attrname, :bool, options)
+        add_attribute Source::Attribute.new(attrname, :bool, options)
       end
 
       alias :bool :boolean
 
       def integer(attrname, options = {})
-        @attrs << Source::Int.new(attrname, options)
+        add_attribute Source::Int.new(attrname, options)
       end
 
       alias :int :integer
 
       def float(attrname, options = {})
-        @attrs << Source::Attribute.new(attrname, :float, options)
+        add_attribute Source::Attribute.new(attrname, :float, options)
       end
 
       def timestamp(attrname, options = {})
-        @attrs << Source::Attribute.new(attrname, :timestamp, options)
+        add_attribute Source::Attribute.new(attrname, :timestamp, options)
       end
 
       def multi(attrname, options = {})
-        @attrs << Source::Attribute.new(attrname, :multi, options)
+        add_attribute Source::Attribute.new(attrname, :multi, options)
       end
 
       #--
@@ -101,10 +101,22 @@ module XMLPipes #:nodoc:
       #++
 
       def ordinal(attrname, options = {})
-        @attrs << Source::Attribute.new(attrname, :str2ordinal, options)
+        add_attribute Source::Attribute.new(attrname, :str2ordinal, options)
       end
 
       alias :str2ordinal :ordinal
+
+      private
+
+      def add_field(field)
+        @fields.reject!{ |f| f.name == field.name }
+        @fields << field
+      end
+
+      def add_attribute(attribute)
+        @attrs.reject!{ |a| a.name == attribute.name }
+        @attrs << attribute
+      end
 
     end
   end

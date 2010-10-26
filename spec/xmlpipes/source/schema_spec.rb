@@ -140,4 +140,11 @@ describe XMLPipes::Source::Schema do
 
   end
 
+  it 'keeps attributes uniqued by name' do
+    @schema.integer :rating
+    @schema.float :rating
+    @schema.attrs.size.should == 1
+    @schema.attrs.first.type.should == :float
+  end
+
 end
