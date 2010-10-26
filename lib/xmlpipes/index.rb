@@ -52,6 +52,10 @@ module XMLPipes #:nodoc:
 
     alias :attrs :attributes
 
+    def names
+      has_deltas? ? [core_name, delta_name] : [core_name]
+    end
+
     def core_name
       "#{@name}_core"
     end

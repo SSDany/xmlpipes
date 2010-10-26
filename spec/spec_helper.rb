@@ -9,4 +9,5 @@ dir = SPEC_ROOT.parent.join('lib').to_s
 $:.unshift(dir) unless $:.include?(dir)
 
 require 'xmlpipes'
+require 'fixtures/article.rb'
 require 'fixtures/book.rb'
