@@ -1,3 +1,5 @@
+require 'xmlpipes/search/documentable'
+
 module XMLPipes #:nodoc:
   class Search
 
@@ -75,18 +77,6 @@ module XMLPipes #:nodoc:
       @options[:max_matches] # FIXME try to get actual value from index_options
     end
 
-    def client
-      cli = config.client
-      cli.max_matches = max_matches if max_matches
-      cli.offset      = offset
-      cli.limit       = limit
-      cli.match_mode  = match_mode
-      cli.filters     = internal_filters + filters
-      cli.sort_mode   = sort_mode
-      cli.sort_by     = sort_by.join(', ') unless sort_by.empty?
-      cli
-    end
-
     def populated?
       !!@populated
     end
@@ -101,17 +91,16 @@ module XMLPipes #:nodoc:
       @results
     end
 
-    def document_ids
-      results[:matches].map { |thing| thing[:doc] }
-    end
-
-    def documents
-      results[:matches].map { |thing| document(thing) }
-    end
-
-    def each_document(&block)
-      raise LocalJumpError unless block_given?
-      results[:matches].map { |thing| yield(document(thing)) }
+    def client
+      cli = config.client
+      cli.max_matches = max_matches if max_matches
+      cli.offset      = offset
+      cli.limit       = limit
+      cli.match_mode  = match_mode
+      cli.filters     = internal_filters + filters
+      cli.sort_mode   = sort_mode
+      cli.sort_by     = sort_by.join(', ') unless sort_by.empty?
+      cli
     end
 
     def clone
@@ -190,7 +179,7 @@ module XMLPipes #:nodoc:
     def apply_options(value = {})
       @options ||= {}
       value.each do |k,v|
-        case k.to_sym
+        case key = k.to_sym
         when :with
           apply_filters(false, v)
         when :without
@@ -202,7 +191,7 @@ module XMLPipes #:nodoc:
         when :classes
           @classes = Array(v)
         else
-          @options[k] = v
+          @options[key] = v
         end
       end
       self
@@ -216,11 +205,6 @@ module XMLPipes #:nodoc:
       @results = client.query(query, indexes)
     rescue Errno::ECONNREFUSED => exception
       raise
-    end
-
-    def document(thing)
-      klass = config.class_from_crc(thing[:attributes]['xmlpipes_class_crc'].to_i)
-      klass.from_document_id(thing[:doc].to_i)
     end
 
     def attributes

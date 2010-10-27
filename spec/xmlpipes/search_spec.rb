@@ -405,17 +405,4 @@ describe XMLPipes::Search do
 
   end
 
-  describe '#documents' do
-
-    it 'works (just a temporary integration test)' do
-      search = XMLPipes::Search.new('Misaki', :classes => Book)
-      matches = []
-      matches << {:attributes => {'xmlpipes_class_crc' => '1809255439'},:doc => '1558914253'}
-      search.should_receive(:results).and_return(:matches => matches)
-      documents = search.documents
-      documents.first.title.should == 'NHK ni Youkoso!'
-    end
-
-  end
-
 end
