@@ -92,9 +92,10 @@ describe XMLPipes::Search::Paginated do
     end
 
     it 'returns nil when there is no next page' do
-      paginated = XMLPipes::Search.new('Misaki').paginate(:per_page => 10, :page => 2)
+      paginated = XMLPipes::Search.new('Misaki').paginate(:per_page => 10, :page => 3)
       paginated.search.stub!(:results).and_return(:total => 20)
       paginated.next_page.should be_nil
+      paginated.should be_out_of_bounds
     end
 
     it 'returns the next page value otherwise' do

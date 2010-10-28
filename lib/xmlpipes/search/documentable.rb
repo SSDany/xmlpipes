@@ -3,6 +3,19 @@ module XMLPipes #:nodoc:
 
     module Documentable
 
+      def method_missing(method_id, *args, &block)
+        if to_a.respond_to?(method_id)
+          self.class.class_eval <<-METHOD, __FILE__, __LINE__ + 1
+          def #{method_id}(*args, &block); self.to_a.#{method_id}(*args,&block); end
+          METHOD
+          send(method_id, *args, &block)
+        else
+          raise NoMethodError # TODO: message
+        end
+      end
+
+      private
+
       def document_ids
         results[:matches].map { |thing| thing[:doc] }
       end
@@ -11,17 +24,10 @@ module XMLPipes #:nodoc:
         results[:matches].map { |thing| document(thing) }
       end
 
-      def each_document(&block)
-        raise LocalJumpError unless block_given?
-        results[:matches].map { |thing| yield(document(thing)) }
-      end
-
       def document(thing)
         klass = config.class_from_crc(thing[:attributes]['xmlpipes_class_crc'].to_i)
         klass.from_document_id(thing[:doc].to_i)
       end
-
-      private :document
 
     end
 

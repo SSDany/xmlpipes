@@ -399,7 +399,7 @@ describe XMLPipes::Search do
 
     it 'returns true otherwise' do
       @search.should_receive(:client).and_return(mock(:client, :query => {:matches => []}))
-      @search.documents
+      @search.to_a
       @search.should be_populated
     end
 

@@ -6,6 +6,7 @@ module XMLPipes #:nodoc:
     SEPARATOR = ' '.freeze
 
     def initialize(*args)
+      @array        = []
       @classes      = []
       @filters      = []
       @sort_by      = []
@@ -81,9 +82,9 @@ module XMLPipes #:nodoc:
       !!@populated
     end
 
-    def repopulate
-      @populated = false
+    def to_a
       populate
+      @array
     end
 
     def results
@@ -203,6 +204,7 @@ module XMLPipes #:nodoc:
       return if populated?
       @populated = true
       @results = client.query(query, indexes)
+      @array = (@options[:ids_only] ? document_ids : documents)
     rescue Errno::ECONNREFUSED => exception
       raise
     end
