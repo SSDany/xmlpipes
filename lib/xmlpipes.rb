@@ -17,8 +17,6 @@ module XMLPipes
     klass.extend XMLPipes::Searchable
   end
 
-  def self.search(*args)
-    XMLPipes::Search.new(*args)
-  end
+  extend XMLPipes::Searchable
 
 end

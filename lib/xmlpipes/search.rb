@@ -179,7 +179,7 @@ module XMLPipes #:nodoc:
     def apply_options(value = {})
       @options ||= {}
       value.each do |k,v|
-        case key = k.to_sym
+        case k
         when :with
           apply_filters(false, v)
         when :without
@@ -191,7 +191,7 @@ module XMLPipes #:nodoc:
         when :classes
           @classes = Array(v)
         else
-          @options[key] = v
+          @options[k] = v
         end
       end
       self
