@@ -187,12 +187,16 @@ describe XMLPipes::Configuration do
     end
 
     it 'includes all necessary indexes into the sphinx config' do
+      @config.should =~ /index articles_core/
+      @config.should =~ /index articles_delta : articles_core/
       @config.should =~ /index titles_core/
       @config.should =~ /index books_core/
       @config.should =~ /index books_delta : books_core/
     end
 
     it 'includes all necessary sources into the sphinx config' do
+      @config.should =~ /source articles_delta_source : articles_core_source/
+      @config.should =~ /source articles_core_source/
       @config.should =~ /source titles_core_source/
       @config.should =~ /source books_delta_source : books_core_source/
       @config.should =~ /source books_core_source/
