@@ -1,4 +1,4 @@
-require 'thor'
+require 'thor' unless defined?(Thor)
 
 module XMLPipes #:nodoc:
   class Cli < Thor
@@ -13,7 +13,7 @@ module XMLPipes #:nodoc:
     class_option :environment   , :type => :string  , :aliases => '-e', :desc => 'environment'
 
     desc "sphinx start", "Start search daemon."
-    method_option :force, :type => :boolean, :alias => '-f', :desc => 'Force restart.'
+    method_option :force, :type => :boolean, :aliases => '-f', :desc => 'Force restart.'
 
     def start
       if controller.running?
@@ -68,7 +68,7 @@ module XMLPipes #:nodoc:
     end
 
     def apply_configuration
-      XMLPipes::Configuration.configure { |c| 
+      XMLPipes::Configuration.configure { |c|
         c.root = self.destination_root
         c.environment = options.environment if options.environment
       }
