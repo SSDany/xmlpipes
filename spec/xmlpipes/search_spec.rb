@@ -405,4 +405,20 @@ describe XMLPipes::Search do
 
   end
 
+  describe '#respond_to?' do
+
+    before(:each) do
+      @search = XMLPipes::Search.new('Misaki')
+    end
+
+    it 'responds to Array methods' do
+      @search.should respond_to(:each)
+    end
+
+    it 'responds to Search methods' do
+      @search.should respond_to(:match_mode)
+    end
+
+  end
+
 end

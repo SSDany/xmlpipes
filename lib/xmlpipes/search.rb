@@ -60,17 +60,23 @@ module XMLPipes #:nodoc:
       end
     end
 
-    def offset(value = nil)
-      return @options[:offset] && @options[:offset].to_i if value.nil?
+    def search_offset
+      @options[:offset]
+    end
+
+    def offset(value)
       copy = clone
-      copy.options[:offset] = value
+      copy.options[:offset] = value.to_i
       copy
     end
 
-    def limit(value = nil)
-      return @options[:limit] && @options[:limit].to_i if value.nil?
+    def search_limit
+      @options[:limit]
+    end
+
+    def limit(value)
       copy = clone
-      copy.options[:limit] = value
+      copy.options[:limit] = value.to_i
       copy
     end
 
@@ -94,9 +100,9 @@ module XMLPipes #:nodoc:
 
     def client
       cli = config.client
-      cli.max_matches = max_matches if max_matches
-      cli.offset      = offset
-      cli.limit       = limit
+      cli.max_matches = max_matches   if max_matches
+      cli.offset      = search_offset if search_offset
+      cli.limit       = search_limit  if search_limit
       cli.match_mode  = match_mode
       cli.filters     = internal_filters + filters
       cli.sort_mode   = sort_mode
@@ -191,6 +197,8 @@ module XMLPipes #:nodoc:
           apply_order(v)
         when :classes
           @classes = Array(v)
+        when :offset, :limit
+          @options[k] = v.to_i
         else
           @options[k] = v
         end

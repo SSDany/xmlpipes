@@ -1,17 +1,18 @@
 module XMLPipes #:nodoc:
   class Search #:nodoc:
 
-    # based on:
-    # ThinkingSphinx::Search
     class Paginated
 
       attr_reader :per_page
       attr_reader :current_page
 
       def initialize(search, options = {})
+        @array        = []
         @search       = search
         @current_page = options[:page] ? options[:page].to_i : 1
         @per_page     = options[:per_page] ? options[:per_page].to_i : 20
+
+        @search.send(:apply_options, :limit => per_page, :offset => offset)
       end
 
       def offset
@@ -42,10 +43,8 @@ module XMLPipes #:nodoc:
 
       include Documentable
 
-      attr_reader :search
-
       def to_a
-        @search.to_a
+        @array = @search.to_a
       end
 
       def results
@@ -65,9 +64,7 @@ module XMLPipes #:nodoc:
       # just wraps a copy of self into the Search::Paginated,
       # so the #paginate is definitely the endpoint.
       def paginate(options = {})
-        paginated = XMLPipes::Search::Paginated.new(clone, options)
-        paginated.search.apply_options :limit => paginated.per_page, :offset => paginated.offset
-        paginated
+        XMLPipes::Search::Paginated.new(clone, options)
       end
 
     end
