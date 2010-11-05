@@ -38,5 +38,13 @@ module XMLPipes #:nodoc:
       options[:verbose] ? system(cmd) : `#{cmd}`
     end
 
+    def running?
+      !!pid && !!Process.kill(0, pid.to_i)
+    rescue Errno::EPERM => e
+      true
+    rescue Exception => e
+      false
+    end
+
   end
 end
