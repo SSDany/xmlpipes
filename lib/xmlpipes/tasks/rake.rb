@@ -35,6 +35,13 @@ namespace :xmlpipes do
     end
   end
 
+  desc "Restart Sphinx."
+  task :restart do
+    Rake::Task['xmlpipes:stop'].invoke
+    sleep(0.25)
+    Rake::Task['xmlpipes:start'].invoke
+  end
+
   task :prepare do
     @config = XMLPipes::Configuration.instance
     @config.apply_config
