@@ -1,7 +1,7 @@
-require 'xmlpipes/search/documentable'
+require 'xmlpipes/collection'
 
 module XMLPipes #:nodoc:
-  class Search
+  class Search < Collection
 
     SEPARATOR = ' '.freeze
 
@@ -215,6 +215,19 @@ module XMLPipes #:nodoc:
       @array = (@options[:ids_only] ? document_ids : documents)
     rescue Errno::ECONNREFUSED => exception
       raise
+    end
+
+    def document_ids
+      results[:matches].map { |thing| thing[:doc] }
+    end
+
+    def documents
+      results[:matches].map { |thing| document(thing) }
+    end
+
+    def document(thing)
+      klass = config.class_from_crc(thing[:attributes]['xmlpipes_class_crc'].to_i)
+      klass.from_document_id(thing[:doc].to_i)
     end
 
     def attributes

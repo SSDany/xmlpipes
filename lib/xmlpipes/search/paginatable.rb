@@ -1,7 +1,7 @@
 module XMLPipes #:nodoc:
   class Search #:nodoc:
 
-    class Paginated
+    class Paginated < Collection
 
       attr_reader :per_page
       attr_reader :current_page
@@ -40,8 +40,6 @@ module XMLPipes #:nodoc:
       def out_of_bounds?
         current_page > total_pages
       end
-
-      include Documentable
 
       def to_a
         @array = @search.to_a

@@ -421,4 +421,17 @@ describe XMLPipes::Search do
 
   end
 
+  # TODO: shared examples
+  describe '#documents' do
+
+    it 'works (just a temporary integration test)' do
+      search = XMLPipes::Search.new('Misaki', :classes => Book)
+      matches = []
+      matches << {:attributes => {'xmlpipes_class_crc' => '1809255439'},:doc => '1558914253'}
+      search.should_receive(:client).and_return(mock(:client, :query => {:matches => matches}))
+      search.first.title.should == 'NHK ni Youkoso!'
+    end
+
+  end
+
 end
